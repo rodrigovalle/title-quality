@@ -9,7 +9,7 @@ features = ['country', 'sku_id', 'title', 'category1', 'category2', 'category3',
 
 # training, test, and validation data
 data = pd.read_csv('data_train.csv', header=None, names=features)
-split_idx = len(data) - 10000 # amount to split for validation data
+split_idx = len(data) - 11000 # amount to split for validation data
 
 data.drop(columns=['sku_id'], inplace=True)
 
@@ -49,5 +49,7 @@ print('training...')
 concise_cls.fit(train_title_vecs, np.ravel(concise_train.values))
 #clarity_cls.fit(title_vecs, clarity_train.values)
 
-mse = mean_squared_error(np.ravel(concise_validation.values), concise_cls.predict(validation_title_vecs))
+y_pred = concise_cls.predict_proba(validation_title_vecs)[:,1]
+y_true = np.ravel(concise_validation.values)
+mse = mean_squared_error(y_true, y_pred)
 print(mse)
