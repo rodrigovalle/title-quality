@@ -1,6 +1,6 @@
 from sklearn import svm
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.model_selection import GridSearchCV, ShuffleSplit
 from sklearn.metrics import mean_squared_error, make_scorer
 
 from helper import caching_trainer, load_data
@@ -23,8 +23,8 @@ X_test = vectorizer.transform(test['title'].values)
 # train an SVM binary classifier for each of these labels
 # hyperparameter documentation found at:
 # http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
-concise_cls = svm.SVC(kernel='rbf', tol=1e-3, probability=True)
-clarity_cls = svm.SVC(kernel='rbf', tol=1e-3, probability=True)
+concise_cls = svm.SVC(kernel='rbf', tol=1e-2, probability=True)
+clarity_cls = svm.SVC(kernel='rbf', tol=1e-2, probability=True)
 
 #concise_fit = lambda: concise_cls.fit(X_train, concise_train)
 #clarity_fit = lambda: clarity_cls.fit(X_train, clarity_train)
@@ -44,8 +44,9 @@ def proba_mse(y, y_pred):
 
 scorer = make_scorer(proba_mse, needs_proba=True, greater_is_better=False)
 
-print('starting grid search...', flush=True)
-gridsearch = GridSearchCV(concise_cls, parameters, scoring=scorer)
+cv = ShuffleSplit(3, train_size=0.2, test_size=0.2)
+gridsearch = GridSearchCV(concise_cls, parameters, cv=cv, scoring=scorer,
+                          n_jobs=-1, verbose=10, refit=False)
 gridsearch_fit = lambda: gridsearch.fit(X_train, concise_train)
 
 caching_trainer(gridsearch_fit, 'gridsearch_concise')

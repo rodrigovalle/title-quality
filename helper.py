@@ -46,9 +46,9 @@ def caching_trainer(train_fn, filename, retrain=False):
     retrain: set to true to force training.
     """
     def train_and_cache():
-        print('training...')
         estimator = train_fn()
         with open(filename + ext, 'wb') as dumpfile:
+            print('saving model to ' + filename + ext, flush=True)
             pickle.dump(estimator, dumpfile, pickle.HIGHEST_PROTOCOL)
         return estimator
 
@@ -58,7 +58,7 @@ def caching_trainer(train_fn, filename, retrain=False):
     try:
         with open(filename + ext, 'rb') as dumpfile:
             estimator = pickle.load(dumpfile)
-            print('loaded model from ' + filename + ext)
+            print('loaded model from ' + filename + ext, flush=True)
             return estimator
     except (IOError, FileExistsError):
         return train_and_cache()
