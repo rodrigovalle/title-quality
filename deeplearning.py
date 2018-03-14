@@ -153,16 +153,16 @@ if __name__ == "__main__":
   #Build keras model
   model = Sequential()
 
-  model.add(Dense(units=40, activation ='relu', input_dim=shape[1]))
+  model.add(Dense(units=50, activation ='relu', input_dim=shape[1]))
   model.add(Dense(units=20, activation='relu'))
   model.add(Dense(units=2, activation = 'softmax'))
 
-  sgd = optimizers.SGD(lr=0.03, decay=1e-7, momentum=0.9, nesterov=True)
+  sgd = optimizers.SGD(lr=0.01, decay=1e-7, momentum=0.9, nesterov=True)
   model.compile(loss='mean_squared_error',
                 optimizer=sgd,
                 metrics=['mse', 'accuracy'])
 
-  model.fit(X_train, y_train, epochs=4000, batch_size=128, validation_split=0.2)
+  model.fit(X_train, y_train, epochs=6000, batch_size=128, validation_split=0.2)
 
   loss_and_metrics = model.evaluate(X_test, y_test, batch_size=128)
 
