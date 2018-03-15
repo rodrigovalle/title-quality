@@ -7,8 +7,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras import optimizers
 import keras
-from keras import regularizers
-import tensorflow as tf
+
 from sklearn import preprocessing
 
 
@@ -143,8 +142,8 @@ if __name__ == "__main__":
   print(concise_features[0])
   X_train = concise_features[:32000]
   X_test = concise_features[32000:]
-  y_train = keras.utils.to_categorical(df['conciseness'][:32000].values, 2)
-  y_test = keras.utils.to_categorical(df['conciseness'][32000:].values, 2)
+  y_train = keras.utils.to_categorical(df['clarity'][:32000].values, 2)
+  y_test = keras.utils.to_categorical(df['clarity'][32000:].values, 2)
 
   print(y_train)
 
@@ -167,6 +166,6 @@ if __name__ == "__main__":
   loss_and_metrics = model.evaluate(X_test, y_test, batch_size=128)
 
   print("final_score", loss_and_metrics)
-  print("sha[e", shape)
+  print("shape", shape)
   classes = model.predict(X_test, batch_size=128)
   #print(list(classes))
