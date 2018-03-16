@@ -36,6 +36,9 @@ def load_data():
     #test = pd.read_csv('data_test.csv', header=None, names=features)
 
     return {
+        'data': data,
+        'concise_label': concise_label,
+        'clarity_label': clarity_label,
         'concise_train': (concise_train_X, concise_train_y),
         'concise_test': (concise_test_X, concise_test_y),
         'clarity_train': (clarity_train_X, clarity_train_y),
