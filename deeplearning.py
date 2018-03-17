@@ -6,6 +6,7 @@ import argparse
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
 from keras import optimizers
+from keras.models import  load_model
 import keras
 from sklearn.model_selection import StratifiedKFold
 import spacy
@@ -182,8 +183,47 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument('--nogeneration', '-n', action='store_true')
   parser.add_argument('--generationonly', '-g', action='store_true')
+  parser.add_argument('--pretrained', '-p', action = 'store_true')
+
 
   args = parser.parse_args()
+
+  #If p flag is set, simply load a pretrained model
+  if args.pretrained:
+    features = concise_features = np.load('data/concise_features.npy')
+    df = pd.read_csv("data/data_train_clean.csv", dtype=object)
+    X_train = concise_features
+    y_train = df['conciseness'].values
+    y_clarity_train = df['clarity'].values
+
+    model = load_model('data/modelconcise.h5')
+
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=100)
+
+    cvscores_conciseness = []
+    for train, test in kfold.split(X_train, y_train):
+      y_train_cat = keras.utils.to_categorical(y_train, 2)
+      loss_and_metrics = model.evaluate(X_train[test], y_train_cat[test], batch_size=128)
+      print(loss_and_metrics)
+      cvscores_conciseness.append(pow(loss_and_metrics[0], 0.5))
+
+    model = load_model('data/modelclarity.h5')
+    cvscores_clarity = []
+    for train, test in kfold.split(X_train, y_clarity_train):
+      y_train_cat = keras.utils.to_categorical(y_clarity_train, 2)
+      loss_and_metrics = model.evaluate(X_train[test], y_train_cat[test], batch_size=128)
+      print(loss_and_metrics)
+      cvscores_clarity.append(pow(loss_and_metrics[0], 0.5))
+
+    with open('./results/deeplearning', 'w') as f:
+      f.write(("Results from pretrained DNN model:\n"))
+      f.write("Average Conciseness score: {}\n".format( np.mean(cvscores_conciseness)))
+      f.write("STD: {}\n".format(np.std(cvscores_conciseness)))
+      f.write("Average Clarity score: {}\n".format(np.mean(cvscores_clarity)))
+      f.write("Std: {}\n".format(np.std(cvscores_clarity)))
+
+
+    exit(0)
 
   if args.nogeneration:
     df = pd.read_csv("data/data_train_clean.csv", dtype=object)
@@ -218,28 +258,19 @@ if __name__ == "__main__":
     print("Generation complete")
     exit()
 
-  #normalize features
-  #concise_features = preprocessing.normalize(concise_features,axis=1)
-  print(concise_features[0])
 
   #Split out test set
   X_train = concise_features
-  #X_test = concise_features[32000:]
   y_train = df['conciseness'].values
   y_clarity_train = df['clarity'].values
-  #y_test = keras.utils.to_categorical(df['conciseness'][32000:].values, 2)
-
-  print(y_train)
-
 
   shape = concise_features.shape
-  print(shape)
 
   kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=10)
 
 
+  #Train Conciseness Model
   cvscores_conciseness = []
-
   for train,test in kfold.split(X_train, y_train):
     print("train", train)
     print("test", test)
@@ -264,7 +295,10 @@ if __name__ == "__main__":
     print(loss_and_metrics)
     cvscores_conciseness.append(pow(loss_and_metrics[0],0.5))
 
+  model.save("data/modelconcise.h5")
 
+
+  #Train Clarity Model
   cvscores_clarity = []
   for train,test in kfold.split(X_train, y_clarity_train):
 
@@ -288,6 +322,8 @@ if __name__ == "__main__":
     loss_and_metrics = model.evaluate(X_train[test], y_train_cat[test], batch_size=128)
     print(loss_and_metrics)
     cvscores_clarity.append(pow(loss_and_metrics[0],0.5))
+
+  model.save("data/modelclarity.h5")
 
   #Evaluate
   print("final conciseness score", np.mean(cvscores_conciseness))

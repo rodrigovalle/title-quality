@@ -178,7 +178,7 @@ def bag_of_words_model(features, labels, mode):
   for units in HIDDEN_UNITS:
     bow = tf.layers.dense(bow, units=units, activation=tf.nn.relu)
 
-  dropout = tf.layers.dropout(inputs=bow, rate = 0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
+  dropout = tf.layers.dropout(inputs=bow, rate = 0.1, training=mode == tf.estimator.ModeKeys.TRAIN)
 
   logits = tf.layers.dense(bow, MAX_LABEL, activation=None)
   return estimator_spec_for_softmax_classification(
