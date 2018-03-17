@@ -7,6 +7,18 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
+## Running the models
+
+```bash
+$ python main.py
+```
+
+If you wish to retrain the models from scratch instead of loading the pretrained
+files, be warned that this will take upwards of 8 hours (parallelization not
+possible):
+
+Change line 95 in the top-level train function: set `retrain=True`.
+
 ## Training data
 **data_train.csv** is a CSV text file containing product features in the
 following format:
