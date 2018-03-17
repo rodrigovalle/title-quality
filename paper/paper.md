@@ -64,7 +64,7 @@ assumed to be Gaussian. Second is the Multinomial Naïve Bayes, where the data u
 assumed to be multinomial distributed. The multinomial implementation is one of
 the classic variants used for text classifications. The third and final
 implementation is the Bernoulli Naïve Bayes, suited for data with multivariate
-Bernoulli distributions, and would work well with binary valued data.[1] 
+Bernoulli distributions, and would work well with binary valued data. [1]
 
 The given test data was split up at the 11000 from last item mark, roughly two
 thirds of the given data.  Everything up to the last 11000 entries are used as
@@ -88,10 +88,10 @@ to the other Naïve Bayes implementations tests, Gaussian Naïve Bayes suffers
 from higher resource usage and is much slower. This is a consequence of
 requiring matrices be dense matrices. In order to get Gaussian Naïve Bayes to
 actually run, the virtual machine used to do the tests had to be given about
-10gb of memory to work with, and even with this, applying Gaussian Naïve Bayes
+10GB of memory to work with, and even with this, applying Gaussian Naïve Bayes
 for the clarity tests failed due to not enough allocated memory. Because data
 batching was not done, results for Gaussian Naïve Bayes were skipped for the
-clarity tests.[2] 
+clarity tests. [2] 
 
 The results of conciseness test were poor compared to the other implementations.
 The RMSE for the base fit was 0.690, and remained approximately the same across
@@ -115,7 +115,7 @@ The implementation for Multinomial Naïve Bayes performed much better than the
 Gaussian implementation. To start, it did not require matrices being fed in to
 be dense, and as such sparse matrices works. Unlike the Gaussian implementation,
 Multinomial Naïve Bayes actually has a smoothing function, and allows the
-toggling of fit priors.[3] 
+toggling of fit priors. [3] 
 
 Because of the sparse matrices, training and predicting are also much faster.
 And even more, it was able to complete the clarity tests as well. For the
@@ -153,7 +153,7 @@ instead of the count vectorizer as used by both Gaussian and Multinomial
 implementations. Training and prediction speed was faster than Gaussian, and not
 too much different from Multinomial. Like the Multinomial implementation, it has
 a smoothing function, and allows the toggling of fit priors in addition to being
-able to use class priors.[4] 
+able to use class priors. [4] 
 
 Like the Multinomial Naïve Bayes implementation, Bernoulli Naïve Bays didn’t
 result in any significant RMSE results for the clarity tests, but did do well
@@ -188,22 +188,23 @@ numbers are, however, still unmatched by results from our tests with SMV and
 TensorflowNN, both of which provided much better results in the sub 0.1s.
 TensorflowNN in particular, reached an MSE result of 0.045. However, compared to
 Tensorflow as will be shown, Naïve Bayes can give its results with significantly
-less resources required and time spent.  An interesting observation is that
-under almost all circumstances, using the base settings alone resulted in some
-of the best predictions available from Naïve Bayes, and that adding priors or
-other features such as categories into the training only serves to worsen the
-results. Parts of this could be argued that the requirements for scoring these
-tests didn’t really look into the accuracy of the titles and descriptions
-themselves, and other attributes such as length may play bigger role in being
-a good determinant for predictions. 
+less resources required and time spent.
+
+An interesting observation is that under almost all circumstances, using the
+base settings alone resulted in some of the best predictions available from
+Naïve Bayes, and that adding priors or other features such as categories into
+the training only serves to worsen the results. Parts of this could be argued
+that the requirements for scoring these tests didn’t really look into the
+accuracy of the titles and descriptions themselves, and other attributes such as
+length may play bigger role in being a good determinant for predictions. 
 
 The rather high results from the tests could also indicate that Naïve Bayes may
 not be the most suitable method for the given task, lacking in concepts that
 a neural network may be able to learn and adapt to.  All the tests done with
 Naïve Bayes had training and prediction done within or around one minute, and
 within the 10GB memory cap (with the exception of Gaussian Naïve Bayes which
-exceeded 10gb for the concise tests). Compare this to Tensorflow’s 20 minute
-training time and reaching 40gb in data requirements and the trade-offs are
+exceeded 10GB for the concise tests). Compare this to Tensorflow’s 20 minute
+training time and reaching 40GB in data requirements and the trade-offs are
 clear. 
 
 ### Future work with Naïve Bayes There are still more feature combinations that
@@ -217,20 +218,6 @@ even if the prediction is not as good as other methods, its speed and resource
 requirements can still lend it an upper hand under conditions where speed is
 required and resources lacking. 
 
-References: 
-
-[1] Scikit-learn developers. 1.9. Naïve Bayes. Retrieved March 16, 2018 from http://scikit-
-learn.org/stable/modules/naive_bayes.html 
-
-[2] Scikit-learn developers. GaussianNB. Retrieved March 16, 2018 from http://scikit-
-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html 
-
-[3] Scikit-learn developers. MultinomialNB. Retrieved March 16, 2018 from http://scikit-
-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html
- 
-[4] Scikit-learn developers. BernoulliNB. Retrieved March 16, 2018 from http://scikit-
-learn.org/stable/modules/generated/sklearn.naive_bayes.BernoulliNB.html
-
 ## Support Vector Machine
 The support vector machine classifier, at its core, separates labeled data in
 $n$ dimensional space with an $n-1$ dimensional hyperplane. The best hyperplane
@@ -241,7 +228,7 @@ Most of the time though, data is not linearly seperable in $n$ dimensions and so
 to get around this (and make support vector machines the stable and widely used
 tool that they are today), support vector machines will map $n$ dimensional
 vectors into some higher dimensional space where the data *can* be separated by
-a hyperplane. [4]
+a hyperplane. [8]
 
 ### Model Selection
 We did our training of the SVM model using SciKit Learn's implementation, which
@@ -255,7 +242,7 @@ hyperparameters in the later hyperparameter grid-search.
 The model, with the Radial Basis Function (RBF) kernel specified, has two major
 tunable hyperparameters: C and gamma. The C parameter is a tradeoff between
 "misclassification of training examples agains the simplicity of the decision
-surface" [1]. A high C might classify more training examples correnctly at the
+surface" [5]. A high C might classify more training examples correnctly at the
 expense of a more complicated separation, and a low C will cause the model to
 output a smoother separation surface at the expense of misclassifying more
 training examples. The gamma parameter has to do with the radial basis function
@@ -284,7 +271,7 @@ most documents. This is not what we want because an overabundance of these
 globally frequently occurring words in any one particular title might signify
 a title of poor quality, and in addition, produces noisy feature vectors with
 short documents. The binary features that we chose to start with are simple,
-lightweight, and resistant to noise, even if they are high dimensional. [6]
+lightweight, and resistant to noise, even if they are high dimensional. [10]
 
 Later in our investigation, it became apparent that better feature vectors were
 necessary if the model was going to improve. These binary word vectors did not
@@ -292,7 +279,7 @@ capture enough of a title's semantic properties to allow the SVM to find a good
 separation.
 
 To get around this, we employed the use of the Word2Vec based Doc2Vec algorithm
-to encode titles as vectors [5]. The Doc2Vec neural network trains on all titles in
+to encode titles as vectors [9]. The Doc2Vec neural network trains on all titles in
 the training set in order to build a feature space where related documents are
 close to each other. For our purposes, we tagged each document with the three
 categories of product that it belonged to, in order to give Doc2Vec a better
@@ -308,7 +295,7 @@ present in the title, etc.
 In order to choose reasonable values for the hyperparameters C and gamma, we
 performed a grid search across the ranges
 C = $[10^{-5}, 10^{-3}, ..., 10^{-13}, 10^{-15}]$ and
-gamma = $[10^{-15}, 10^{-13}, ..., 10^1]$. [3]
+gamma = $[10^{-15}, 10^{-13}, ..., 10^1]$ [7].
 
 Gridsearch works by training an SVM on each pair of these parameters and
 performing cross validation to see which parameters yield an SVM with the lowest
@@ -342,7 +329,7 @@ majority class. This allows us to see how well our model might perform on a more
 balanced dataset, which is useful for our gridsearch where we want to choose
 good hyperparameters. In general, this skew of our dataset can be used to our
 advantage, so we wouldn't want to train using SMOTE because it might cause the
-SVM to think that certain labels are more frequent than they actually are. [2]
+SVM to think that certain labels are more frequent than they actually are [6].
 
 ![Clarity SVM Classifier Gridsearch with SMOTE](gridsearch_clarity_SMOTE.png)
 
@@ -391,19 +378,6 @@ A further improvement might be to use the label output from the clarity model in
 the conciseness model or vice versa, because looking at the data it's pretty
 clear that these two labels are somewhat dependent on each other.
 
-### References
-[1] SVM RBF Parameters http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html
-
-[2] How to implement SMOTE in GridSearchCV. https://stackoverflow.com/questions/48370150/how-to-implement-smote-in-cross-validation-and-gridsearchcv
-
-[3] Which search range for determining optimal C and gamma parameters. https://stats.stackexchange.com/questions/43943/which-search-range-for-determining-svm-optimal-c-and-gamma-parameters
-
-[4] SciKit Learn SVM http://scikit-learn.org/stable/modules/svm.html
-
-[5] Gensim Doc2Vec https://radimrehurek.com/gensim/models/doc2vec.html
-
-[6] SciKit Learn CountVectorizer http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html
-
 ## Deep Neural Networks
 
 Deep neural networks are powerful universal classifiers that have the ability to
@@ -437,7 +411,7 @@ the deep neural network model. After experimenting with bag of word models using
 tensorflow built in vocab processor with only marginal improvements in RMSE
 scores, we chose to use the Stanford’s GloVe word embedding model in order to
 generate word embeddings that retained information about linguistic and semantic
-similarity(4). To transform titles, categories, and description strings into
+similarity [14]. To transform titles, categories, and description strings into
 vectorized features, the mean GloVe embedding vector was calculated by taking
 the mean of all the 200 dimensional word vectors generated from the string
 words. This embedding allowed us to further generate interesting features like
@@ -446,7 +420,7 @@ the norm between the corresponding mean embedding vectors.
 
 Finally, we also utilized linguistic features from the Spacy natural language
 processing libraries ‘en’ language model to generate more numeric features from
-our title, category, and description strings(5) We extracted noun chunks from
+our title, category, and description strings [15]. We extracted noun chunks from
 title strings, category strings, and description strings, and once again
 calculated mean embedding vector norms between them. We also incorporated counts
 of part of speech classification for words in the title strings. Put together,
@@ -465,7 +439,7 @@ The ReLU or rectified linear unit is an activation function that has become very
 popular in recent years. It computes the function f(x) = max(0,x). It has been
 found to greatly improve the convergence speed of gradient descent optimizers
 when compared to sigmoid or tanh functions due to its linear and non-saturating
-form (3).
+form [13].
 
 The choices for the hidden units and layers came from experimentation, although
 in terms of the final RMSE scores, the shape of the internal model did not
@@ -473,7 +447,7 @@ change the results much as long as there were enough hidden units to avoid
 underfitting. We noted that increasing model depth past two hidden layers did
 not improve the model’s performance, but slowed down the training significantly.
 Overfitting is protected against in our model through regularization in our
-dropout layer(6).
+dropout layer [16].
 
 Determining optimal training hyperparameters was also a challenging experimental
 process. After testing with various optimizers, we found the best results using
@@ -484,7 +458,7 @@ considered were stochastic gradient descent, which performed poorly both in
 terms of convergence speed and model accuracy, and the Adam optimizer, which
 converged the fastest but with slightly worse RMSE scores. The Adagrad optimizer
 is a subgradient method that attempts to dynamically incorporate knowledge about
-the geometry of data observed in previous iterations (2). Mean squared error was
+the geometry of data observed in previous iterations [12]. Mean squared error was
 selected as the loss function since RMSE was the final model metric that we
 wanted to optimize. In terms of training epochs, 200 epochs were used for the
 conciseness model and 100 epochs for clarity. The model is actually not fully
@@ -529,29 +503,6 @@ had yet to observe any evidence of model overfitting, suggesting that if more
 computational power and time was available for training, the model could further
 converge. 
 
-References: 
-
-1. BeautifulSoup 4.6.0, https://www.crummy.com/software/BeautifulSoup/
-
-2. Duchi, John, Elad Hazan, and Yoram Singer. "Adaptive subgradient methods for
-   online learning and stochastic optimization." Journal of Machine Learning
-   Research 12.Jul (2011): 2121-2159.
-
-3. Krizhevsky, Alex, et al. “ImageNet Classification with Deep Convolutional
-   Neural Networks.”Communications of the ACM, vol. 60, no. 6, 2017, pp. 84–90.,
-   doi:10.1145/3065386.
-
-4. Pennington, Jeffrey, Richard Socher, and Christopher Manning. "Glove: Global
-vectors for word representation." Proceedings of the 2014 conference on
-empirical methods in natural language processing (EMNLP). 2014.
-
-5. Spacy 2.0.9, “Industrial-Strength Natural Language Processing”,
-   https://spacy.io/
-
-6. Srivastava, Nitish, et al. "Dropout: A simple way to prevent neural networks
-from overfitting." The Journal of Machine Learning Research 15.1 (2014):
-1929-1958.
-
 # Related work
 Other participants who participated in this challenge have used a variety of
 different approaches. One such strategy was to project tree-based models like
@@ -578,4 +529,93 @@ including trying out Word2Vec for feature generation.
 
 # Conclusion
 
+As an overarching conclusion to the project, it’s hard to call any method as
+superior all around. If anything, it reveals a case of trade-offs between time
+needed and accuracy desired. Each method had their pros and cons.  The three
+implementations of Naïve Bayes that were tested were relatively easy to set up,
+very fast to train, and very fast to give results. It wasn’t the best when it
+comes to how accurate it was, returning the highest RMSE scores out of the
+methods tested, but it was certainly the fastest. Training time using the same
+amount of training data took less than a minute, and prediction time was equally
+fast. The best concise score was 0.479, while the best clarity score was 0.237.
+These where, however, outliers to the various other scores received from
+different parameters used.
+
+SVM played a down-the-middle line out of the three methods tested. With an RMSE
+of 0.435 for conciseness, and 0.230 for clarity, its concise score exceeds that
+of any of the Naïve Bayes scores, while its clarity score outperformed Naïve
+Bayes’ averaged scores from all its tests. The better scores does come with the
+price of a longer running time, however.  Training for the SVM model took hours
+to complete, a significant increase from the mere minute used by the Naïve Bayes
+methods. It should be noted that faster methods to train the SVM model exist
+and could be investigated for use in future works. Traditional SVMs are better
+suited for smaller datasets due to their longer running time.
+
+Lastly, the Deep Neural Network (DNN) method gave the best scores out of the
+methods tried, at 0.352 for conciseness and 0.217 for clarity, beating both the
+scores from running SVM, and the average scores for Naïve Bayes. Training and
+tuning the model were, like in the SVM case, in the scale of hours. The long
+training time means tuning was also slow as it required time to complete
+training before tuning can be done. DNN does have an advantage where it could be
+parallelized easier, and in theory could allow for better performances and
+scaling.  Overall, while SVM and DNN gave better results, they each have
+drawbacks. Naïve Bayes may have been the worse in accuracy, but it was also the
+fastest to work it. It’s hard to give a solid winner for each the methods, as
+under different operational requirements, each one of them has a place. Naïve
+Bayes can do its calculations much faster as a tradeoff for being less accurate.
+SVM gives better results on smaller datasets in exchange for longer training
+times. DNN gives the best results while giving up time needed and resource
+requirements on the system it’s running on.
+
+# References
+
+[1] Scikit-learn developers. 1.9. Naïve Bayes. Retrieved March 16, 2018 from http://scikit-
+learn.org/stable/modules/naive_bayes.html 
+
+[2] Scikit-learn developers. GaussianNB. Retrieved March 16, 2018 from http://scikit-
+learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html 
+
+[3] Scikit-learn developers. MultinomialNB. Retrieved March 16, 2018 from http://scikit-
+learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html
+ 
+[4] Scikit-learn developers. BernoulliNB. Retrieved March 16, 2018 from http://scikit-
+learn.org/stable/modules/generated/sklearn.naive_bayes.BernoulliNB.html
+
+[5] SVM RBF Parameters http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html
+
+[6] How to implement SMOTE in GridSearchCV. https://stackoverflow.com/questions/48370150/how-to-implement-smote-in-cross-validation-and-gridsearchcv
+
+[7] Which search range for determining optimal C and gamma parameters. https://stats.stackexchange.com/questions/43943/which-search-range-for-determining-svm-optimal-c-and-gamma-parameters
+
+[8] SciKit Learn SVM http://scikit-learn.org/stable/modules/svm.html
+
+[9] Gensim Doc2Vec https://radimrehurek.com/gensim/models/doc2vec.html
+
+[10] SciKit Learn CountVectorizer http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html
+
+[11] BeautifulSoup 4.6.0, https://www.crummy.com/software/BeautifulSoup/
+
+[12] Duchi, John, Elad Hazan, and Yoram Singer. "Adaptive subgradient methods for
+     online learning and stochastic optimization." Journal of Machine Learning
+     Research 12.Jul (2011): 2121-2159.
+
+[13] Krizhevsky, Alex, et al. “ImageNet Classification with Deep Convolutional
+     Neural Networks.”Communications of the ACM, vol. 60, no. 6, 2017, pp. 84–90.,
+     doi:10.1145/3065386.
+
+[14] Pennington, Jeffrey, Richard Socher, and Christopher Manning. "Glove: Global
+     vectors for word representation." Proceedings of the 2014 conference on
+     empirical methods in natural language processing (EMNLP). 2014.
+
+[15] Spacy 2.0.9, “Industrial-Strength Natural Language Processing”,
+     https://spacy.io/
+
+[16] Srivastava, Nitish, et al. "Dropout: A simple way to prevent neural networks
+     from overfitting." The Journal of Machine Learning Research 15.1 (2014):
+     1929-1958.
+
 # Task and work load distribution
+
+Rodrigo Valle - SVMs, writer, typesetting
+Krit Saefang - Naive Bayes, writer
+Bill Tang - Neural networks, packager
