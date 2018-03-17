@@ -57,3 +57,11 @@ the arguments are as follows:
 **f**: 0 for not using class priors, 1 for using class priors
 
 All arguments must be given
+
+A batch file for running everything is provided as run.sh. This can be executed with:
+
+```bash
+$ sh run.sh
+```
+
+Results from running everything will be saved to a text file saved in the main directory as NBResults.txt
