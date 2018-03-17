@@ -34,3 +34,36 @@ format as *data_train.csv*.
 ## Testing Data
 **data_test.csv** is a text file containing product features. It has the same
 format as *data_train.csv*.
+
+
+## Deep Learning model
+**deeplearning.py** contains the code for feature generation and training of our
+DNN model, built using Keras on top of Tensorflow.
+
+For the word embeddings, you must first download the GloVe 6B pretrained word vectors
+from the official glove project site [here](http://nlp.stanford.edu/data/glove.6B.zip)
+and place the unzipped folder into the data folder.
+
+This model also requires Tensorflow, Keras, Sci-kit learn, tqdm, BeautifulSoup4,
+numpy, pandas, and Spacy.
+
+After installing Spacy, the en language model must be downloaded with
+```bash
+$ python -m spacy download en
+```
+before features can be generated. 
+
+To run feature generation and training + model evaluation simply run:
+
+```bash
+$ python deeplearning.py
+```
+Note: Feature generation + cross validation training can take several hours
+
+If you only want to generate cleaned data and features, use the -g flag.
+
+If you want to use the pregernerated cleaned data and features included, use the -n flag
+to proceed directly to model training.
+
+
+
