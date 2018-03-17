@@ -1,9 +1,10 @@
 #!/bin/bash
 
-python -m venv venv/
-source venv/bin/activate
-pip install -r requirements.txt
-python main.py > results/svm.txt
+
+
+echo "Running SVM"
+python3 main.py > results/svm.txt
+
 touch results/naivebayes.txt
 echo "Running Gaussian Naive Bayes"
 echo "Results will be recorded to results/naivebayes.txt"
