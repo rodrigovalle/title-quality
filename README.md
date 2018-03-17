@@ -34,3 +34,20 @@ format as *data_train.csv*.
 ## Testing Data
 **data_test.csv** is a text file containing product features. It has the same
 format as *data_train.csv*.
+
+## Running
+To run the implementation, simply run the command with arguments a through f:
+
+```bash
+$ python main_NB.py a b c d e f
+```
+
+the arguments are as follows:
+**a**: 0 for clarity, 1 for concise, 2 for pre-generated features (Requires 'concise_features.npy' in Data folder)
+**b**: 0 for GaussianNB, 1 for MultinomialNB, 2 for BernoulliNB
+**c**: 0 for no smoothing, 1 for smoothing
+**d**: 0 for title/description only as features, 1 for using categories as well
+**e**: 0 for not using fit priors, 1 for using fit priors
+**f**: 0 for not using class priors, 1 for using class priors
+
+All arguments must be given
