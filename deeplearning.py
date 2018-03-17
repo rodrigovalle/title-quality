@@ -215,7 +215,7 @@ if __name__ == "__main__":
       print(loss_and_metrics)
       cvscores_clarity.append(pow(loss_and_metrics[0], 0.5))
 
-    with open('./results/deeplearning', 'w') as f:
+    with open('./results/deeplearning.txt', 'w') as f:
       f.write(("Results from pretrained DNN model:\n"))
       f.write("Average Conciseness score: {}\n".format( np.mean(cvscores_conciseness)))
       f.write("STD: {}\n".format(np.std(cvscores_conciseness)))
@@ -325,9 +325,17 @@ if __name__ == "__main__":
 
   model.save("data/modelclarity.h5")
 
-  #Evaluate
+  # Evaluate
   print("final conciseness score", np.mean(cvscores_conciseness))
   print("std", np.std(cvscores_conciseness))
   print("final clarity score", np.mean(cvscores_clarity))
   print("std", np.std(cvscores_clarity))
+
+  # Record results
+  with open('./results/deeplearning.txt', 'w') as f:
+    f.write(("Results from DNN model:\n"))
+    f.write("Average Conciseness score: {}\n".format(np.mean(cvscores_conciseness)))
+    f.write("STD: {}\n".format(np.std(cvscores_conciseness)))
+    f.write("Average Clarity score: {}\n".format(np.mean(cvscores_clarity)))
+    f.write("STD: {}\n".format(np.std(cvscores_clarity)))
 

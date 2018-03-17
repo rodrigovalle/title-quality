@@ -58,12 +58,16 @@ To run feature generation and training + model evaluation simply run:
 ```bash
 $ python deeplearning.py
 ```
-Note: Feature generation + cross validation training can take several hours
+Note: Feature generation + cross validation training can take a great deal of time
 
 If you only want to generate cleaned data and features, use the -g flag.
+This should take around 25 minutes
 
 If you want to use the pregernerated cleaned data and features included, use the -n flag
 to proceed directly to model training.
+This should take around 30-45 minutes for the full cross validation of both models
 
+To test the model on the pretrained models included in the data folder, use the -p flag
+This should take about 10 seconds
 
 
