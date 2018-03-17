@@ -4,11 +4,12 @@ import numpy as np
 from tqdm import tqdm
 import argparse
 from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, Dropout
 from keras import optimizers
 import keras
-import threading
+from sklearn.model_selection import StratifiedKFold
 import spacy
+
 
 from sklearn import preprocessing
 
@@ -37,7 +38,7 @@ def letter_embedding_vectorizer(X, w2v):
   return np.array([
     np.mean([w2v[w] for w in words if w in w2v] or [np.zeros(dim)], axis=0) for words in X])
 
-def generate_concise_features(df):
+def generate_features(df):
 
   data = []
   w2v = {}
@@ -87,8 +88,6 @@ def generate_concise_features(df):
       noun_roots.append(chunk.root.text)
 
     noun_roots_embed = mean_embedding_vectorizer(noun_roots, w2v)[0]
-    for dim in noun_roots_embed:
-      features.append(dim)
 
 
     #generate basic features
@@ -127,20 +126,50 @@ def generate_concise_features(df):
     if len(cat1_words) > 0:
       cat1_embed = mean_embedding_vectorizer(cat1_words, w2v)[0]
       features.append(np.linalg.norm(title_embed - cat1_embed))
+
+      cat1_roots = []
+      doc = nlp(row["category1"])
+      for chunk in doc.noun_chunks:
+        cat1_roots.append(chunk.root.text)
+
+      cat1_roots_embed = mean_embedding_vectorizer(cat1_roots, w2v)[0]
+
+      features.append(np.linalg.norm(noun_roots_embed - cat1_roots_embed))
     else:
       features.append(np.linalg.norm(title_embed))
+      features.append(np.linalg.norm(noun_roots_embed))
 
     if len(cat2_words) > 0:
       cat2_embed = mean_embedding_vectorizer(cat2_words, w2v)[0]
       features.append(np.linalg.norm(title_embed - cat2_embed))
+
+      cat2_roots = []
+      doc = nlp(row["category2"])
+      for chunk in doc.noun_chunks:
+        cat2_roots.append(chunk.root.text)
+
+      cat2_roots_embed = mean_embedding_vectorizer(cat2_roots, w2v)[0]
+
+      features.append(np.linalg.norm(noun_roots_embed - cat2_roots_embed))
     else:
       features.append(np.linalg.norm(title_embed))
+      features.append(np.linalg.norm(noun_roots_embed))
 
     if len(cat1_words) > 0:
       cat3_embed = mean_embedding_vectorizer(cat3_words, w2v)[0]
       features.append(np.linalg.norm(title_embed - cat3_embed))
+
+      cat3_roots = []
+      doc = nlp(row["category3"])
+      for chunk in doc.noun_chunks:
+        cat3_roots.append(chunk.root.text)
+
+      cat3_roots_embed = mean_embedding_vectorizer(cat3_roots, w2v)[0]
+
+      features.append(np.linalg.norm(noun_roots_embed - cat3_roots_embed))
     else:
       features.append(np.linalg.norm(title_embed))
+      features.append(np.linalg.norm(noun_roots_embed))
 
     data.append(features)
 
@@ -182,7 +211,7 @@ if __name__ == "__main__":
     concise_features = np.load('data/concise_features.npy')
 
   else:
-    concise_features = generate_concise_features(df)
+    concise_features = generate_features(df)
     np.save('data/concise_features.npy', concise_features)
 
   if args.generationonly:
@@ -190,38 +219,79 @@ if __name__ == "__main__":
     exit()
 
   #normalize features
-  concise_features = preprocessing.normalize(concise_features,axis=1)
+  #concise_features = preprocessing.normalize(concise_features,axis=1)
   print(concise_features[0])
 
   #Split out test set
-  X_train = concise_features[:32000]
-  X_test = concise_features[32000:]
-  y_train = keras.utils.to_categorical(df['conciseness'][:32000].values, 2)
-  y_test = keras.utils.to_categorical(df['conciseness'][32000:].values, 2)
+  X_train = concise_features
+  #X_test = concise_features[32000:]
+  y_train = df['conciseness'].values
+  y_clarity_train = df['clarity'].values
+  #y_test = keras.utils.to_categorical(df['conciseness'][32000:].values, 2)
 
   print(y_train)
 
 
   shape = concise_features.shape
-  #Build keras model
-  model = Sequential()
-  model.add(Dense(units=400, activation ='relu', input_dim=shape[1]))
-  model.add(Dense(units=150, activation='relu'))
-  model.add(Dense(units=50, activation='relu'))
-  model.add(Dense(units=2, activation = 'softmax'))
+  print(shape)
 
-  sgd = optimizers.SGD(lr=0.01, decay=1e-7, momentum=0.9, nesterov=True)
-  model.compile(loss='mean_squared_error',
-                optimizer=sgd,
-                metrics=['mse', 'accuracy'])
+  kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=10)
 
-  #Train model
-  model.fit(X_train, y_train, epochs=2000, batch_size=128, validation_split=0.2)
 
-  loss_and_metrics = model.evaluate(X_test, y_test, batch_size=128)
+  cvscores_conciseness = []
+
+  for train,test in kfold.split(X_train, y_train):
+    print("train", train)
+    print("test", test)
+
+    y_train_cat = keras.utils.to_categorical(y_train, 2)
+    #Build keras model
+    model = Sequential()
+    model.add(Dense(units=100, activation ='relu', input_dim=shape[1]))
+    model.add(Dropout(rate = 0.2))
+    model.add(Dense(units=50, activation='relu'))
+    model.add(Dense(units=2, activation = 'softmax'))
+
+    sgd = optimizers.Adagrad(lr=0.01)
+    model.compile(loss='mean_squared_error',
+                  optimizer=sgd,
+                  metrics=['mse'])
+
+    #Train model
+    model.fit(X_train[train], y_train_cat[train], epochs=150, batch_size=128, validation_data=(X_train[test], y_train_cat[test]))
+
+    loss_and_metrics = model.evaluate(X_train[test], y_train_cat[test], batch_size=128)
+    print(loss_and_metrics)
+    cvscores_conciseness.append(pow(loss_and_metrics[0],0.5))
+
+
+  cvscores_clarity = []
+  for train,test in kfold.split(X_train, y_clarity_train):
+
+    y_train_cat = keras.utils.to_categorical(y_clarity_train, 2)
+    X_train = preprocessing.normalize(X_train,axis=1)
+    #Build keras model
+    model = Sequential()
+    model.add(Dense(units=100, activation ='relu', input_dim=shape[1]))
+    model.add(Dropout(rate = 0.2))
+    model.add(Dense(units=50, activation='relu'))
+    model.add(Dense(units=2, activation = 'softmax'))
+
+    sgd = optimizers.Adagrad(lr=0.01)
+    model.compile(loss='mean_squared_error',
+                  optimizer=sgd,
+                  metrics=['mse'])
+
+    #Train model
+    model.fit(X_train[train], y_train_cat[train], epochs=100, batch_size=128, validation_data=(X_train[test], y_train_cat[test]))
+
+    loss_and_metrics = model.evaluate(X_train[test], y_train_cat[test], batch_size=128)
+    print(loss_and_metrics)
+    cvscores_clarity.append(pow(loss_and_metrics[0],0.5))
 
   #Evaluate
-  print("final_score", loss_and_metrics)
-  print("shape", shape)
-  classes = model.predict(X_test, batch_size=128)
-  #print(list(classes))
+  print("final conciseness score", np.mean(cvscores_conciseness))
+  print("std", np.std(cvscores_conciseness))
+  print("final clarity score", np.mean(cvscores_clarity))
+  print("std", np.std(cvscores_clarity))
+
